@@ -1,0 +1,57 @@
+import sqlite3
+from datetime import datetime
+
+# Create or connect to a SQLite database
+conn = sqlite3.connect('expenses.db')
+cursor = conn.cursor()
+
+# Create expenses table
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS expenses (
+    id INTEGER PRIMARY KEY,
+    date TEXT,
+    category TEXT,
+    amount REAL,
+    description TEXT
+)
+''')
+
+# Function to add a new expense
+def add_expense(date, category, amount, description):
+    cursor.execute('''
+    INSERT INTO expenses (date, category, amount, description) VALUES (?, ?, ?, ?)
+    ''', (date, category, amount, description))
+    conn.commit()
+
+# Function to view all expenses
+def view_expenses():
+    cursor.execute('SELECT * FROM expenses')
+    expenses = cursor.fetchall()
+    for expense in expenses:
+        print(expense)
+
+# Function to handle user input
+def user_interface():
+    while True:
+        print("1. Add Expense")
+        print("2. View Expenses")
+        print("3. Exit")
+        choice = input("Enter choice: ")
+        if choice == '1':
+            date = input("Enter date (YYYY-MM-DD): ")
+            category = input("Enter category: ")
+            amount = float(input("Enter amount: "))
+            description = input("Enter description: ")
+            add_expense(date, category, amount, description)
+        elif choice == '2':
+            view_expenses()
+        elif choice == '3':
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the user interface
+user_interface()
+
+# Close the database connection
+conn.close()
